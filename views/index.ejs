@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Epic Button Game</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+       $(document).ready(function () {
+
+          var socket = io.connect();
+
+         socket.on("initalCount", function(data){
+              $("#message").html("The button has been pressed " + JSON.stringify(data.response) +'time(s)' ); 
+              console.log("is this working")
+          });
+
+          //this even will emit to the server when someone pushs the button 
+          $("#push").click(function(){
+
+            console.log("button pushed");
+            
+            socket.emit("pushButton", {action: "User has pushed the button"});
+
+            //create a response by the server when we push the button 
+
+            socket.on("pushCounter", function(data){
+              $("#message").html("The button has been pressed " + JSON.stringify(data.response) +'time(s)' ); 
+
+              console.log(data.response)
+              }); 
+          
+
+          })
+
+          $("#reset").click(function(){
+            console.log("click")
+            socket.emit("pushReset", {action: "User has reseted the count"});
+
+            socket.on("countZero", function(data){
+
+              $("#message").html("Counter has been set to 0" ); 
+
+            })
+
+          })
+
+
+
+       })
+    </script>
+</head>
+<body>
+  <center>
+        <h2 id="message"></h2>
+      <h4>Push the button to update the count!</h4>
+      <button id="push">Push the epic button</button>
+      <button id="reset">Reset Count</button>
+    </center>
+</body>
+</html>
